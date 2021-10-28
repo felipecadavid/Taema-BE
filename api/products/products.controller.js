@@ -22,6 +22,17 @@ async function getProducts(req, res) {
   }
 }
 
+async function getProductsByCategory(req, res) {
+  // READ
+  try {
+    const { category } = req.params;
+    const products = await Product.find({ category });
+    res.status(200).send(products);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+}
+
 async function createProduct(req, res) {
   // CREATE
   try {
@@ -79,5 +90,6 @@ module.exports = {
   getProducts,
   createProduct,
   editProduct,
-  deleteProduct
+  deleteProduct,
+  getProductsByCategory
 };
