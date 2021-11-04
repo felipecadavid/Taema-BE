@@ -5,10 +5,34 @@ async function getASpecificProduct(req, res) {
   try {
     const { id } = req.params;
     const product = await Product.findById(id);
+    console.log(product);
     if (!product) return res.status(404).send("Product not found");
     res.status(200).send(product);
   } catch (error) {
     res.status(400).send(error);
+  }
+}
+
+async function getAListOfProducts(req, res) {
+  // READ
+  try {
+    console.log(req.query)
+    const queryArray = Object.values(req.query);
+    const idList = queryArray.map((product) => JSON.parse(product).product);
+    const promises = idList.map(async (id) => {
+      return await Product.findOne({ _id: id })
+    });
+    const productList = await Promise.all(promises);
+    
+    const productListWithQuantities = productList.map((product) => {
+      const { _id, name, image, price, totalPrice, discount, description, additions } = product;
+      const quantity = JSON.parse(queryArray.find((product) => _id.equals(JSON.parse(product).product))).quantity;
+      return { _id, name, image, totalPrice, price, discount, description, additions, quantity };
+    });
+    res.status(200).send(productListWithQuantities);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
   }
 }
 
@@ -36,7 +60,16 @@ async function getProductsByCategory(req, res) {
 async function createProduct(req, res) {
   // CREATE
   try {
-    const { name, image, price, discount, description, additions, category, hasCard } = req.body;
+    const {
+      name,
+      image,
+      price,
+      discount,
+      description,
+      additions,
+      category,
+      hasCard,
+    } = req.body;
     const newProduct = await Product.create({
       name,
       image,
@@ -45,7 +78,7 @@ async function createProduct(req, res) {
       description,
       additions,
       category,
-      hasCard
+      hasCard,
     });
     res.status(200).send(`Created new Product: ${newProduct}`);
   } catch (error) {
@@ -89,8 +122,9 @@ async function deleteProduct(req, res) {
 module.exports = {
   getASpecificProduct,
   getProducts,
+  getAListOfProducts,
   createProduct,
   editProduct,
   deleteProduct,
-  getProductsByCategory
+  getProductsByCategory,
 };
