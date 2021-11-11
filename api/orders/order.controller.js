@@ -10,6 +10,19 @@ async function getOrders(req, res) {
   }
 }
 
+async function getOrderDetailed(req, res){
+  // READ
+  try {
+    console.log("aqui")
+    const { id } = req.params;
+    const order = await Order.findById(id).populate("orderItems.productId");
+    res.json(order);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error });
+  }
+}
+
 async function createOrder(req, res) {
   // CREATE
   try {
@@ -23,4 +36,19 @@ async function createOrder(req, res) {
     res.status(500).json({ message: error });
   }
 }
-module.exports = { getOrders, createOrder };
+
+async function updateStatus(req, res) {
+  // UPDATE
+  try {
+    const { id } = req.params;
+    const { status: orderStatus } = req.body;
+    console.log(id, orderStatus);
+    const order = await Order.findByIdAndUpdate(id, { orderStatus }, { new: true });
+    res.json(order);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error });
+  }
+}
+
+module.exports = { getOrders, createOrder, getOrderDetailed, updateStatus };

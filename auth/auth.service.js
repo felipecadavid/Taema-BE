@@ -32,7 +32,6 @@ const getData = async (req, res) => {
     if(req.token) {
       token = req.token;
     } else {
-      console.log(req.headers);
       token = req.headers.authorization;
     }
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -48,4 +47,25 @@ const getData = async (req, res) => {
   }
 };
 
-module.exports = { logger, getData };
+const verifyAdmin = async (req, res, next) => {
+  try {
+    let token;
+    if(req.token) {
+      token = req.token;
+    } else {
+      token = req.headers.authorization;
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userData._id);
+    if (user.isAdmin) {
+      next();
+    } else {
+      res.status(401).send("unauthorized");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("server error");
+  }
+};
+
+module.exports = { logger, getData, verifyAdmin };
