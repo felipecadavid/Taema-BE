@@ -2,10 +2,12 @@ const { Router } = require('express');
 
 const controller = require('./products.controller');
 
+const auth = require('../../auth/auth.service');
+
 const app = new Router();
 
 //Endpoints
-app.get('/', controller.getProducts);
+app.get('/', auth.verifyAdmin, controller.getProducts);
 app.get('/categories/:category', controller.getProductsByCategory);
 app.get('/getAList', controller.getAListOfProducts);
 app.get('/getOne/:id', controller.getASpecificProduct);
