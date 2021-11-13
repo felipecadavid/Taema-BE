@@ -1,5 +1,5 @@
 const Product = require("./product.model");
-const cloudinary = require("Cloudinary").v2;
+const cloudinary = require("cloudinary").v2;
 
 async function getASpecificProduct(req, res) {
   // READ
