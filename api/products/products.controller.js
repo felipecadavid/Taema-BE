@@ -1,4 +1,5 @@
 const Product = require("./product.model");
+const cloudinary = require("Cloudinary").v2;
 
 async function getASpecificProduct(req, res) {
   // READ
@@ -16,18 +17,39 @@ async function getASpecificProduct(req, res) {
 async function getAListOfProducts(req, res) {
   // READ
   try {
-    console.log(req.query)
+    console.log(req.query);
     const queryArray = Object.values(req.query);
     const idList = queryArray.map((product) => JSON.parse(product).product);
     const promises = idList.map(async (id) => {
-      return await Product.findOne({ _id: id })
+      return await Product.findOne({ _id: id });
     });
     const productList = await Promise.all(promises);
-    
+
     const productListWithQuantities = productList.map((product) => {
-      const { _id, name, image, price, totalPrice, discount, description, additions } = product;
-      const quantity = JSON.parse(queryArray.find((product) => _id.equals(JSON.parse(product).product))).quantity;
-      return { _id, name, image, totalPrice, price, discount, description, additions, quantity };
+      const {
+        _id,
+        name,
+        image,
+        price,
+        totalPrice,
+        discount,
+        description,
+        additions,
+      } = product;
+      const quantity = JSON.parse(
+        queryArray.find((product) => _id.equals(JSON.parse(product).product))
+      ).quantity;
+      return {
+        _id,
+        name,
+        image,
+        totalPrice,
+        price,
+        discount,
+        description,
+        additions,
+        quantity,
+      };
     });
     res.status(200).send(productListWithQuantities);
   } catch (error) {
@@ -60,16 +82,8 @@ async function getProductsByCategory(req, res) {
 async function createProduct(req, res) {
   // CREATE
   try {
-    const {
-      name,
-      image,
-      price,
-      discount,
-      description,
-      additions,
-      category,
-      hasCard,
-    } = req.body;
+    const { name, price, discount, description, stock, image, additions, category, hasCard } =
+      req.body;
     const newProduct = await Product.create({
       name,
       image,
@@ -79,8 +93,25 @@ async function createProduct(req, res) {
       additions,
       category,
       hasCard,
+      stock
     });
     res.status(200).send(`Created new Product: ${newProduct}`);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send(error);
+  }
+}
+
+async function uploadImage(req, res) {
+  // CREATE
+  try {
+    cloudinary.uploader.upload(req.files.image.file, (error, result) => {
+      if (error) {
+        return next();
+      }
+      const url = result.url;
+      res.status(200).send(url);
+    });
   } catch (error) {
     res.status(500).send(error);
   }
@@ -97,10 +128,12 @@ async function editProduct(req, res) {
       discount,
       description,
       additions,
+      stock,
+      totalPrice
     } = req.body;
     await Product.updateOne(
       { _id },
-      { name, image, price, discount, description, additions }
+      { name, image, price, discount, description, additions, stock, totalPrice }
     );
     res.status(200).send(`Updated product with ID ${_id}`);
   } catch (error) {
@@ -111,7 +144,7 @@ async function editProduct(req, res) {
 async function deleteProduct(req, res) {
   // DELETE
   try {
-    const { id: _id } = req.body;
+    const { id: _id } = req.params;
     await Product.deleteOne({ _id });
     res.status(200).send(`Deleted product with ID ${_id}`);
   } catch (error) {
@@ -127,4 +160,5 @@ module.exports = {
   editProduct,
   deleteProduct,
   getProductsByCategory,
+  uploadImage,
 };
