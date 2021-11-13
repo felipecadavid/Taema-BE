@@ -128,11 +128,12 @@ async function editProduct(req, res) {
       discount,
       description,
       additions,
-      stock
+      stock,
+      totalPrice
     } = req.body;
     await Product.updateOne(
       { _id },
-      { name, image, price, discount, description, additions, stock }
+      { name, image, price, discount, description, additions, stock, totalPrice }
     );
     res.status(200).send(`Updated product with ID ${_id}`);
   } catch (error) {
