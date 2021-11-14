@@ -11,6 +11,7 @@ app.get("/", auth.verifyAdmin, controller.getProducts);
 app.get("/categories/:category", controller.getProductsByCategory);
 app.get("/getAList", controller.getAListOfProducts);
 app.get("/getOne/:id", controller.getASpecificProduct);
+app.get("/search", controller.searchProducts);
 app.put("/", auth.verifyAdmin, controller.editProduct);
 app.delete("/:id", auth.verifyAdmin, controller.deleteProduct);
 app.post("/", auth.verifyAdmin, controller.createProduct);
