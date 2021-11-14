@@ -58,6 +58,10 @@ const orderSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    orderNumber: {
+      type: String,
+      required: true,
+    }
   },
   {
     timestamps: true,
