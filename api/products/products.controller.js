@@ -68,6 +68,23 @@ async function getProducts(req, res) {
   }
 }
 
+async function searchProducts(req, res) {
+  // READ
+  try {
+    const { q } = req.query;
+    console.log(q);
+    const products = await Product.find({
+      $text: { $search: q },
+    });
+    res.status(200).send(products);
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).send(error);
+  }
+}
+
+
 async function getProductsByCategory(req, res) {
   // READ
   try {
@@ -161,4 +178,5 @@ module.exports = {
   deleteProduct,
   getProductsByCategory,
   uploadImage,
+  searchProducts
 };
