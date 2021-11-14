@@ -18,28 +18,11 @@ async function createCard(req, res) {
 }
 
 async function createCustomer(req, res) {
-
-  const customer_info = req.body;
-
-//   var customer_info = {
-//     token_card: "toke_id",
-//     name: "Joe",
-//     last_name: "Doe", 
-//     email: "joe@payco.co",
-//     default: true,
-// }
-
-epayco.customers.create(customer_info)
-    .then(function(customer) {
-        console.log(customer);
-    })
-    .catch(function(err) {
-        console.log("err: " + err);
+  try {
+    epayco.customers.list().then((customers) => {
     });
 
-  const customerInfo = req.body;
-  console.log(customerInfo);
-  try {
+    const customerInfo = req.body;
     const customer = await epayco.customers.create(customerInfo);
     res.status(201).json({ customer });
   } catch (error) {
@@ -49,37 +32,15 @@ epayco.customers.create(customer_info)
 }
 
 async function charge(req, res) {
-  console.log("aqui")
-  const payment_info = req.body;
-  console.log(payment_info);
-  // const payment_info = {
-  //   token_card: "token_card",
-  //   customer_id: "customer_id",
-  //   doc_type: "CC",
-  //   doc_number: "10358519",
-  //   name: "John",
-  //   last_name: "Doe",
-  //   email: "email@example.com",
-  //   city: "Bogota",
-  //   address: "Cr 4 # 55 36",
-  //   phone: "3005234321",
-  //   cell_phone: "3010000001",
-  //   bill: "OR-1234",
-  //   description: "Payment",
-  //   value: "{VALUE}",
-  //   tax: "0",
-  //   tax_base: "0",
-  //   currency: "COP",
-  //   dues: "1",
-  //   ip: "190.000.000.000" /*This is the client's IP, it is required */,
-  //   url_response: "https://ejemplo.com/respuesta.html",
-  //   url_confirmation: "https://ejemplo.com/confirmacion",
-  //   method_confirmation: "GET",
-  // };
+  let payment_info;
+  if (!req.body.customer_id) {
+    payment_info = { ...req.body, customer_id: "1898c940e19de5b476d1502" };
+  } else {
+    payment_info = req.body;
+  }
   epayco.charge
     .create(payment_info)
     .then(function (charge) {
-      console.log(charge);
       res.status(201).json({ charge });
     })
     .catch(function (err) {
@@ -91,5 +52,5 @@ async function charge(req, res) {
 module.exports = {
   createCard,
   createCustomer,
-  charge
+  charge,
 };
