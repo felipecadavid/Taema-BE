@@ -13,7 +13,6 @@ async function getOrders(req, res) {
 async function getOrderDetailed(req, res){
   // READ
   try {
-    console.log("aqui")
     const { id } = req.params;
     const order = await Order.findById(id).populate("orderItems.productId");
     res.json(order);
@@ -27,8 +26,9 @@ async function createOrder(req, res) {
   // CREATE
   try {
     const { ...orderInfo } = req.body;
-    console.log(orderInfo);
-    const order = new Order(orderInfo);
+    const orderCount = await Order.count();
+    const orderNumber = `OR-${orderCount}`
+    const order = new Order({...orderInfo, orderNumber});
     await order.save();
     res.json({ message: `Order created, id: ${order._id}` });
   } catch (error) {
