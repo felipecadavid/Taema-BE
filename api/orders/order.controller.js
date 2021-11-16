@@ -1,4 +1,5 @@
 const Order = require("./order.model");
+const mail = require("../../mails/mail.service");
 
 async function getOrders(req, res) {
   // READ
@@ -22,7 +23,7 @@ async function getOrderDetailed(req, res){
   }
 }
 
-async function createOrder(req, res) {
+async function createOrder(req, res, next) {
   // CREATE
   try {
     const { ...orderInfo } = req.body;
@@ -30,7 +31,9 @@ async function createOrder(req, res) {
     const orderNumber = `OR-${orderCount}`
     const order = new Order({...orderInfo, orderNumber});
     await order.save();
-    res.json({ message: `Order created, id: ${order._id}` });
+    req.body.orderNumber = orderNumber;
+    req.body.orderId = order._id;
+    next();
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: error });
@@ -44,6 +47,8 @@ async function updateStatus(req, res) {
     const { status: orderStatus } = req.body;
     console.log(id, orderStatus);
     const order = await Order.findByIdAndUpdate(id, { orderStatus }, { new: true });
+    const { clientEmail, orderNumber } = order;
+    await mail.orderStatusChangeFunction(orderNumber, orderStatus, req.body.message, clientEmail);
     res.json(order);
   } catch (error) {
     console.log(error);
