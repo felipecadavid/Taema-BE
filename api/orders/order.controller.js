@@ -29,6 +29,7 @@ async function createOrder(req, res, next) {
     const { ...orderInfo } = req.body;
     const orderCount = await Order.count();
     const orderNumber = `OR-${orderCount}`
+    console.log("ORDERINFO: ", orderInfo);
     const order = new Order({...orderInfo, orderNumber});
     await order.save();
     req.body.orderNumber = orderNumber;

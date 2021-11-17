@@ -28,6 +28,9 @@ const orderSchema = mongoose.Schema(
           type: Number,
           required: true,
         },
+        cardMessage: {
+          type: String,
+        }
       },
     ],
     shippingAddress: {
