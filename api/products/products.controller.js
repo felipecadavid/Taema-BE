@@ -152,11 +152,12 @@ async function editProduct(req, res) {
       description,
       additions,
       stock,
-      totalPrice
+      totalPrice,
+      hasCard
     } = req.body;
     await Product.updateOne(
       { _id },
-      { name, image, price, discount, description, additions, stock, totalPrice }
+      { name, image, price, discount, description, additions, stock, totalPrice, hasCard }
     );
     res.status(200).send(`Updated product with ID ${_id}`);
   } catch (error) {
