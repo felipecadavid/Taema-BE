@@ -1,9 +1,11 @@
 const { Router } = require('express');
-
+const cors = require('cors');
 const controller = require('./order.controller');
 const auth = require('../../auth/auth.service');
 
 const app = new Router();
+
+app.use(cors());
 
 const mail = require('../../mails/mail.service');
 
