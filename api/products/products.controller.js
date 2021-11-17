@@ -25,7 +25,7 @@ async function getAListOfProducts(req, res) {
     });
     const productList = await Promise.all(promises);
 
-    const productListWithQuantities = productList.map((product) => {
+    const productListWithQuantitiesAndCardMessage = productList.map((product) => {
       const {
         _id,
         name,
@@ -35,10 +35,14 @@ async function getAListOfProducts(req, res) {
         discount,
         description,
         additions,
+        hasCard
       } = product;
       const quantity = JSON.parse(
         queryArray.find((product) => _id.equals(JSON.parse(product).product))
       ).quantity;
+      const cardMessage = JSON.parse(
+        queryArray.find((product) => _id.equals(JSON.parse(product).product))
+      ).cardMessage;
       return {
         _id,
         name,
@@ -49,9 +53,11 @@ async function getAListOfProducts(req, res) {
         description,
         additions,
         quantity,
+        cardMessage,
+        hasCard
       };
     });
-    res.status(200).send(productListWithQuantities);
+    res.status(200).send(productListWithQuantitiesAndCardMessage);
   } catch (error) {
     console.log(error);
     res.status(500).send(error);
